@@ -1,30 +1,20 @@
 import requests
 import random
 import sys
+import os
 import time
 
 def main(url, station):
-    print("Mutator started!")  # <-- Ny rad
     while True:
-        humid = random.randint(60, 90)
-        temp = random.randint(0, 10)
-        data = {
-            "humid": str(humid),
-            "station": str(station),
-            "temp": str(temp)
-        }
-        print("Sending data:", data)  # <-- Ny rad
-        try:
-            r = requests.put(url, json=data)
-            print("Response:", r.status_code, r.text)  # <-- Ny rad
-        except Exception as e:
-            print("Error:", e)
-        time.sleep(60)  # skicka var 60:e sekund
+        humid = random.randint(60,90)
+        temp = random.randint(0,10)
+        D = f'{{"humid": "{humid}", "station": "{station}", "temp": "{temp}"}}'.encode('utf-8')
+        print(D)
+        H = {'Content-Type': "application/json",
+             'Accept': "application/vnd.pagerduty+json;version=2"}
+        P = requests.put(url+'/api/reg', data=D, headers=H)
+        print(P.status_code)
+        time.sleep(10)
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: python mutator.py <url> [station]")
-        sys.exit(1)
-    url = sys.argv[1]
-    station = sys.argv[2] if len(sys.argv) > 2 else "99"
-    main(url, station)
+    main(sys.argv[1], sys.argv[2])
